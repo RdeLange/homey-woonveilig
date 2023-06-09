@@ -1,0 +1,106 @@
+{
+  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+  "id": "com.free.woonveilig",
+  "version": "1.0.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "brandColor": "#FF802E",
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "WoonVeilig"
+  },
+  "description": {
+    "en": "Adds local support for the WoonVeilig security system with the free subscription"
+  },
+  "category": [
+    "security"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Peter Butzelaar",
+    "email": "peter.butzelaar@outlook.com"
+  },
+  "drivers": [
+    {
+      "name": {
+        "en": "WoonVeilig Systeem"
+      },
+      "class": "homealarm",
+      "capabilities": [
+        "alarm_generic",
+        "homealarm_state"
+      ],
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "lan"
+      ],
+      "images": {
+        "small": "/drivers/woonveilig-systeem/assets/images/small.png",
+        "large": "/drivers/woonveilig-systeem/assets/images/large.png"
+      },
+      "pair": [
+        {
+          "id": "pair_woonveilig"
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "id": "woonveilig-systeem",
+      "settings": [
+        {
+          "id": "ipaddress",
+          "type": "text",
+          "label": {
+            "en": "Local IP Address",
+            "nl": "Lokale IP Adres"
+          },
+          "hint": {
+            "en": "The IP address of the WoonVeilig System.",
+            "nl": "Het IP adres van het WoonVeilig Systeem."
+          }
+        },
+        {
+          "id": "username",
+          "type": "text",
+          "label": {
+            "en": "Username",
+            "nl": "Gebruikersnaam"
+          },
+          "hint": {
+            "en": "De gebruikersnaam"
+          }
+        },
+        {
+          "id": "password",
+          "type": "password",
+          "label": {
+            "en": "Password",
+            "nl": "Wachtwoord"
+          },
+          "hint": {
+            "en": "The password of the user.",
+            "nl": "Het wachtwoord van de gebruiker."
+          }
+        }
+      ]
+    }
+  ]
+}

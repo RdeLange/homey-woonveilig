@@ -1,0 +1,48 @@
+<header class="homey-header">
+  <h1 class="homey-title" data-i18n="driverHuiscentrale.pairTitle"></h1>
+  <p class="homey-subtitle" data-i18n="driverHuiscentrale.pairSubTitle">
+  </p>
+</header>
+
+<form class="homey-form">
+  <fieldset class="homey-form-fieldset">
+    <legend class="homey-form-legend" data-i18n="driverHuiscentrale.pairFormTitle"></legend>
+    <div class="homey-form-group">
+      <label class="homey-form-label" for="ipaddress" data-i18n="settings.ipaddress"></label>
+      <input class="homey-form-input" id="ipaddress" type="text" />
+    </div>
+    <div class="homey-form-group">
+      <label class="homey-form-label" for="username" data-i18n="settings.username"></label>
+      <input class="homey-form-input" id="username" type="text" />
+    </div>
+    <div class="homey-form-group">
+      <label class="homey-form-label" for="password" data-i18n="settings.password"></label>
+      <input class="homey-form-input" id="password" type="password" />
+    </div>
+  </fieldset>
+
+  <button class="homey-button-primary-full" id="save" data-i18n="driverHuiscentrale.pairNext"></button>
+</form>
+
+<script type="text/javascript">
+    var ipaddressElement = document.getElementById("ipaddress");
+    var usernameElement = document.getElementById("username");
+    var passwordElement = document.getElementById("password");
+    var saveElement = document.getElementById("save");
+
+    saveElement.addEventListener("click", function (event) {
+      event.preventDefault();
+      saveElement.classList.add("is-loading");
+      Homey.emit("login", { "ipaddress": ipaddressElement.value, "username": usernameElement.value, "password": passwordElement.value }).then(function (result) {
+          if(result)
+          {
+            Homey.nextView();
+          }
+          else
+          {
+            Homey.alert(Homey.__("driverHuiscentrale.pairErrorConnecting"));
+            saveElement.classList.remove("is-loading");
+          }
+      });
+    });
+</script>

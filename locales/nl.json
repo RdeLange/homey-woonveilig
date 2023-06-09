@@ -1,0 +1,15 @@
+{
+    "deviceName": "WoonVeilig Systeem",
+    "driverHuiscentrale": {
+        "pairTitle": "WoonVeilig",
+        "pairSubTitle": "WoonVeilig alarm systeem toevoegen",
+        "pairFormTitle": "Inloggegevens",
+        "pairErrorConnecting": "Kon geen verbinding maken met het systeem. Controleer het ip adres en de inloggegevens.",
+        "pairNext": "Volgende"
+    },
+    "settings": {
+        "username": "Gebruikersnaam",
+        "password": "Wachtwoord",
+        "ipaddress": "Lokale IP Adres"
+    }
+}

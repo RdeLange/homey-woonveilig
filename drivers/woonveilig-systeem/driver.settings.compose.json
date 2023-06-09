@@ -1,0 +1,37 @@
+[
+  {
+    "id": "ipaddress",
+    "type": "text",
+    "label": {
+       "en": "Local IP Address",
+       "nl": "Lokale IP Adres"
+      },
+    "hint": {
+      "en": "The IP address of the WoonVeilig System.",
+      "nl": "Het IP adres van het WoonVeilig Systeem."
+    }
+  },
+  {
+    "id": "username",
+    "type": "text",
+    "label": {
+       "en": "Username",
+       "nl": "Gebruikersnaam"
+      },
+    "hint": { 
+      "en": "De gebruikersnaam"
+     }
+  },
+  {
+    "id": "password",
+    "type": "password",
+    "label": {
+       "en": "Password",
+       "nl": "Wachtwoord"
+       },
+    "hint": { 
+      "en": "The password of the user.",
+      "nl": "Het wachtwoord van de gebruiker." 
+    }
+  }
+]

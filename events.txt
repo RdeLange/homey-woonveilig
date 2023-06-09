@@ -1,0 +1,67 @@
+POST http: //192.168.1.21/action/logsGet
+
+Battery low: {
+    "log_time": "2022/11/12 09:03:32",
+    "area": "1",
+    "mode": "",
+    "action": "Device Low Battery",
+    "user": "",
+    "source": "Zone3(Voordeur)",
+    "device_type": "Door Contact",
+    "msg": "Trigger"
+}
+
+Battery full: {
+    "log_time": "2022/12/05 10:12:41",
+    "area": "1",
+    "mode": "",
+    "action": "Device Low Battery",
+    "user": "",
+    "source": "Zone3(Voordeur)",
+    "device_type": "Door Contact",
+    "msg": "Restore"
+}
+
+Alarm arm: {
+    "log_time": "2022/11/11 12:21:55",
+    "area": "1",
+    "mode": "Full Arm", // Filter
+    "action": "Mode Changed", // Filter
+    "user": "",
+    "source": "XML Command",
+    "device_type": "Panel",
+    "msg": "Success" // Filter
+}
+
+Alarm arm home: {
+    "log_time": "2023/01/06 20:58:25",
+    "area": "1",
+    "mode": "Home Arm 1",
+    "action": "Mode Changed",
+    "user": "",
+    "source": "XML Command",
+    "device_type": "Panel",
+    "msg": "Success" // Filter
+}
+
+Alarm disarm: {
+    "log_time": "2022/11/11 07:41:29",
+    "area": "1",
+    "mode": "Disarm", // Filter
+    "action": "Mode Changed", // Filter
+    "user": "User3(Uitlaatservice)",
+    "source": "Zone2(Hal)",
+    "device_type": "Keypad",
+    "msg": "Success" // Filter
+}
+
+Alarm: {
+    "log_time": "2022/11/01 19:14:01",
+    "area": "1",
+    "mode": "Full Arm",
+    "action": "Response",
+    "user": "",
+    "source": "Zone4(Trap)",
+    "device_type": "IR",
+    "msg": "Burglar Alarm" // Filter
+}

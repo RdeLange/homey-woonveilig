@@ -1,0 +1,15 @@
+{
+    "deviceName": "WoonVeilig System",
+    "driverHuiscentrale": {
+        "pairTitle": "WoonVeilig",
+        "pairSubTitle": "Add WoonVeilig alarm system",
+        "pairFormTitle": "Credentials",
+        "pairErrorConnecting": "Error connecting to system. Check ip address and credentials.",
+        "pairNext": "Next"
+    },
+    "settings": {
+        "username": "Username",
+        "password": "Password",
+        "ipaddress": "Local IP Address"
+    }
+}
