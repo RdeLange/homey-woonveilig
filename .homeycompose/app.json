@@ -1,0 +1,29 @@
+{
+  "id": "com.free.woonveilig",
+  "version": "1.0.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "brandColor": "#FF802E",
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "WoonVeilig"
+  },
+  "description": {
+    "en": "Adds local support for the WoonVeilig security system with the free subscription"
+  },
+  "category": [
+    "security"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Peter Butzelaar",
+    "email": "peter.butzelaar@outlook.com"
+  }
+}
