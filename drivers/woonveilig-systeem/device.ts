@@ -6,12 +6,14 @@ class MyDevice extends Homey.Device {
 
   repository!: WoonVeiligRepository;
   runningInterval!: NodeJS.Timeout | null;
+  settings!: WoonVeiligSettings;
 
   /**
    * onInit is called when the device is initialized.
    */
   async onInit() {
-    this.repository = new WoonVeiligRepository(this.getSettings());
+    this.settings = this.getSettings();
+    this.repository = new WoonVeiligRepository(this.settings);
 
     this.registerCapabilityListener('homealarm_state', async (value) => {
       await this.repository.login();
@@ -48,6 +50,15 @@ class MyDevice extends Homey.Device {
       this.setCapabilityValue('alarm_generic', value);
     });
 
+    this.startTimer();
+
+    this.log('WoonVeilig Systeem has been initialized');
+  }
+
+  startTimer() : void {
+    if(this.runningInterval != null)
+    this.homey.clearInterval(this.runningInterval);
+
     // Below code is not thread-safe, but it's good enough for now
     let isReadingEvents = false;
     this.runningInterval = this.homey.setInterval(async () => {
@@ -65,9 +76,7 @@ class MyDevice extends Homey.Device {
         this.log(error);
       }
       isReadingEvents = false;
-    }, 5000);
-
-    this.log('WoonVeilig Systeem has been initialized');
+    }, this.settings.intervalInSeconds * 1000);
   }
 
   /**
@@ -97,12 +106,15 @@ class MyDevice extends Homey.Device {
     settings.ipaddress = newSettings.ipaddress!.toString();
     settings.username = newSettings.username!.toString();
     settings.password = newSettings.password!.toString();
+    settings.intervalInSeconds = Number(newSettings.intervalInSeconds);
     var repository = new WoonVeiligRepository(settings);
     
     if(!await repository.login())
       throw new Error(this.homey.__('driverHuiscentrale.pairErrorConnecting'));
 
+    this.settings = settings;
     this.repository = new WoonVeiligRepository(settings);
+    this.startTimer();
   }
 
   /**

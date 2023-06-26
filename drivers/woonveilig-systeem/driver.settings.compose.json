@@ -19,7 +19,8 @@
        "nl": "Gebruikersnaam"
       },
     "hint": { 
-      "en": "De gebruikersnaam"
+      "en": "The username",
+      "nl": "De gebruikersnaam"
      }
   },
   {
@@ -33,5 +34,19 @@
       "en": "The password of the user.",
       "nl": "Het wachtwoord van de gebruiker." 
     }
+  },
+  {
+    "id": "intervalInSeconds",
+    "type": "number",
+    "min": 1,
+    "max": 60,
+    "label": {
+       "en": "Polling interval in seconds",
+       "nl": "Polling interval in seconden"
+      },
+    "hint": { 
+      "en": "Interval",
+      "nl": "Interval"
+     }
   }
 ]
