@@ -130,11 +130,18 @@ class WoonVeiligRepository {
     }
 
     private getBasicRequestInit(): any {
-        // Use a retry policy, because at random WoonVeilig returns a 401. Also, a user-agent is mandatory as the session seems to be linked to the user-agent
+        // Use a retry policy, because at random WoonVeilig returns a 401. This does not happen in the browser, so I added the exact same request headers as the browser trying to prevent any 401 error. Also, a user-agent is mandatory as the session seems to be linked to the user-agent
         return {
             headers: {
+                'Accept': 'application/json, text/javascript, */*; q=0.01',
+                'Accept-Encoding': 'gzip, deflate',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Authorization': this.authorizationHeader,
+                'Connection': 'keep-alive',
+                'Origin': this.getUrl(''),
+                'Referer': this.getUrl('/setting/log.htm'),
                 'User-Agent': 'HomeyWoonVeilig/1.0.0',
-                'Authorization': this.authorizationHeader
+                'X-Requested-With': 'XMLHttpRequest'
             },
             retry: 3,
             pause: 1000
