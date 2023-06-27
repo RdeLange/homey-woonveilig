@@ -17,7 +17,7 @@ class WoonVeiligDriver extends Homey.Driver {
 
     session.setHandler("login", async function(data: WoonVeiligSettings) : Promise<boolean> {
       settings = data;
-      settings.intervalInSeconds = 5000;
+      settings.intervalInSeconds = 5;
       var repository = new WoonVeiligRepository(settings);
       return await repository.login();
     });
