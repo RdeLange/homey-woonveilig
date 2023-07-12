@@ -2,6 +2,7 @@ import { Device } from "homey";
 import { WoonVeiligSettings } from "../models/woonveiligsettings";
 import { WoonVeiligLog } from "../models/woonveiliglog";
 const fetch = require('node-fetch-retry');
+import { setTimeout } from "timers/promises";
 
 class WoonVeiligRepository {
     private configuration: WoonVeiligSettings;
@@ -29,14 +30,22 @@ class WoonVeiligRepository {
     }
 
     async setState(state: AlarmState) {
-        var request = this.getBasicRequestInit();
-        request.method = 'post'
-        request.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
-        request.body = this.getFormBody({
-            'area': '1',
-            'mode': state
-        });
-        await fetch(this.getUrl('/action/panelCondPost'), request);
+        for(var i = 0; i < 3; i++)
+        {
+            var request = this.getBasicRequestInit();
+            request.method = 'post'
+            request.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
+            request.body = this.getFormBody({
+                'area': '1',
+                'mode': state
+            });
+            var response = await fetch(this.getUrl('/action/panelCondPost'), request);
+            if(response.status == 200)
+                break;
+
+            console.log(response);
+            await setTimeout(1000);
+        }
     }
 
     async processLastLogs(lastLogDate: Date) : Promise<Date> {
