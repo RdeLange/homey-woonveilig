@@ -1,8 +1,10 @@
 import { Device } from "homey";
 import { WoonVeiligSettings } from "../models/woonveiligsettings";
 import { WoonVeiligLog } from "../models/woonveiliglog";
-const fetch = require('node-fetch-retry');
 import { setTimeout } from "timers/promises";
+import { Agent } from "https";
+const fetch = require('node-fetch-retry');
+//const https = require('https');
 
 class WoonVeiligRepository {
     private configuration: WoonVeiligSettings;
@@ -11,17 +13,19 @@ class WoonVeiligRepository {
         'state-changed': [],
         'alarm-changed': []
     };
+    private agent: Agent;
 
     constructor(configuration: WoonVeiligSettings) {
         this.configuration = configuration;
         this.authorizationHeader = `Basic ${Buffer.from(this.configuration.username + ':' + this.configuration.password, 'binary').toString('base64')}`;
+        this.agent = new Agent({ keepAlive: true });
     }
 
     async login(): Promise<boolean> {
         try {
             var request = this.getBasicRequestInit();
             request.method = 'post'
-            var response = await fetch(this.getUrl('/action/login'), request);
+            var response = await fetch(this.getUrl('/action/login'), request, this.agent);
             return response.status == 200;    
         } catch (error) {
             console.log(error);
@@ -39,7 +43,7 @@ class WoonVeiligRepository {
                 'area': '1',
                 'mode': state
             });
-            var response = await fetch(this.getUrl('/action/panelCondPost'), request);
+            var response = await fetch(this.getUrl('/action/panelCondPost'), request, this.agent);
             if(response.status == 200)
                 break;
 
@@ -55,7 +59,7 @@ class WoonVeiligRepository {
         request.body = this.getFormBody({
             'max_count': 20
         });
-        var response = await fetch(this.getUrl('/action/logsGet'), request);
+        var response = await fetch(this.getUrl('/action/logsGet'), request, this.agent);
         if(response.status != 200) {
             console.log(response);
             return lastLogDate;
