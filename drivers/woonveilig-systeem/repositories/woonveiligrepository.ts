@@ -86,7 +86,8 @@ class WoonVeiligRepository {
         var newLogs = logs.filter(log => log.log_time > lastLogDate);
         var modeChangedLogs = newLogs.filter(log => log.action == 'Mode Changed' && log.msg == 'Success');
         var modeDisarmedLogs = modeChangedLogs.filter(log => log.mode == 'Disarm');
-        var alarmChangedLogs = newLogs.filter(log => log.msg == 'Burglar Alarm');
+        // First check is for the motion sensors, the seconds check is when the door is openened and you get some time to enter the pincode but don't do that in time
+        var alarmChangedLogs = newLogs.filter(log => log.msg == 'Burglar Alarm' || (log.action == 'Timeout' && log.msg == 'Entry Timeout'));
 
         var alarmChangedValue: boolean | null = null;
         var stateChangedValue: AlarmState | null = null;
