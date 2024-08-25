@@ -22,11 +22,13 @@ class WoonVeiligRepository {
     }
 
     async login(): Promise<boolean> {
+        
         try {
-            var request = this.getBasicRequestInit();
-            request.method = 'post'
-            var response = await fetch(this.getUrl('/action/login'), request, this.agent);
-            return response.status == 200;    
+           // var request = this.getBasicRequestInit();
+           // request.method = 'post'
+           // var response = await fetch(this.getUrl('/action/login'), request, this.agent);
+           // return response.status == 200; 
+            return true;
         } catch (error) {
             console.log(error);
             return false;
@@ -34,68 +36,109 @@ class WoonVeiligRepository {
     }
 
     async setState(state: AlarmState) {
+        var repeat = 3;
         for(var i = 0; i < 3; i++)
         {
+         if (state == 1) {state = 0}
+            else if (state == 0) {state =2}
+            else if (state == 2) {state =1}
+            console.log("setState to:",state)
             var request = this.getBasicRequestInit();
             request.method = 'post'
             request.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
             request.body = this.getFormBody({
-                'area': '1',
+                //'area': '1',
                 'mode': state
             });
-            var response = await fetch(this.getUrl('/action/panelCondPost'), request, this.agent);
-            if(response.status == 200)
-                break;
+            do {
+                console.log("check1")
+                var response = await this.fetchPlus('/action/panelCondPost',request,this.agent) 
+                    console.log(response)
+                if (response == true) {
+                    console.log("setState Successful")
+                    repeat = 0;
+                }
+                if (response == false) {
+                    console.log("setState not succesful, will try "+[(repeat-1).toString]+" times")
+                    repeat = repeat -1
+                    setTimeout(3000);
+                }
+              }
+              while (repeat > 0); 
+            break;
 
-            console.log(response);
-            await setTimeout(1000);
+            //var feedback = await response.text();
+            //if(response.status == 200 && feedback.included("status: 1"))
+            //    console.log(await response.text());
+            
         }
     }
 
+   async fetchPlus(url:string,req:string,agent:Agent) {
+    console.log("Check2")
+    var response= await fetch(this.getUrl(url), req, agent);
+    var feedback = await response.text();
+            console.log("responsetext:",feedback)
+            if(response.status == 200 && feedback.includes("result : 1")){
+                return true;}
+            else {
+                return false;
+            }
+            
+   }
+    
+
     async processLastLogs(lastLogDate: Date) : Promise<Date> {
         var request = this.getBasicRequestInit();
-        request.method = 'post'
+        request.method = 'get'
         request.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
-        request.body = this.getFormBody({
-            'max_count': 20
-        });
-        var response = await fetch(this.getUrl('/action/logsGet'), request, this.agent);
+        //request.body = this.getFormBody({
+        //    'max_count': 20
+        //});
+       
+        var response = await fetch(this.getUrl('/action/historyGet'), request, this.agent);
+        
         if(response.status != 200) {
-            console.log(response);
             return lastLogDate;
         }
 
-        var logRows = (await response.json()).logrows;
+        var logRowstemp = await response.text();
+        //console.log(logRowstemp)
+        var logRows = this.processcrappyjson(logRowstemp).hisrows
+
         // If there are no new logs
         if(logRows.length == 0)
             return lastLogDate;
 
-        var logs : WoonVeiligLog[] = logRows.map((logRow: { action: string; area: string; device_type: string; log_time: string; mode: string; msg: string; source: string; user: string; }) => {
+        
+        var logs : WoonVeiligLog[] = logRows.map((logRow: { d: string; t: string; s: string; a: string;}) => {
             var log = new WoonVeiligLog();
-            log.action = logRow.action;
-            log.area = logRow.area;
-            log.device_type = logRow.device_type;
-            log.log_time = new Date(logRow.log_time);
-            log.mode = logRow.mode;
-            log.msg = logRow.msg;
-            log.source = logRow.source;
-            log.user = logRow.user;
+            log.action = this.defineAction(logRow.a);
+            log.area = "1";
+            log.device_type = logRow.a;
+            log.log_time = new Date(this.reformattime(logRow.d,logRow.t));
+            log.mode = logRow.a;
+            log.msg = this.defineMsg(logRow.a);
+            log.source = logRow.s;
+            log.user = "admin";
             return log;
         });
+        //console.log(logs)
         
         var newLogs = logs.filter(log => log.log_time > lastLogDate);
+        
         var modeChangedLogs = newLogs.filter(log => log.action == 'Mode Changed' && log.msg == 'Success');
         var modeDisarmedLogs = modeChangedLogs.filter(log => log.mode == 'Disarm');
         // First check is for the motion sensors, the seconds check is when the door is openened and you get some time to enter the pincode but don't do that in time
         var alarmChangedLogs = newLogs.filter(log => log.msg == 'Burglar Alarm' || (log.action == 'Timeout' && log.msg == 'Entry Timeout'));
-
+        
         var alarmChangedValue: boolean | null = null;
         var stateChangedValue: AlarmState | null = null;
 
         // If the alarm went off, check if it was disarmed
         if(alarmChangedLogs.length > 0) {
             // If it was disarmed, the alarm is off now
-            if(modeDisarmedLogs.length > 0 && modeDisarmedLogs[0].log_time > alarmChangedLogs[0].log_time) {
+            if(modeDisarmedLogs.length > 0 && modeDisarmedLogs[modeDisarmedLogs.length-1].log_time > alarmChangedLogs[alarmChangedLogs.length-1].log_time) {
                 alarmChangedValue = false;
             }
             // It was not disarmed, so alarm is on
@@ -109,14 +152,14 @@ class WoonVeiligRepository {
         }
 
         // Now we simply set the latest state
+        //console.log(modeChangedLogs)
         if(modeChangedLogs.length > 0) {
-            switch(modeChangedLogs[0].mode) {
-                case 'Full Arm':
+            //console.log("State",modeChangedLogs[modeChangedLogs.length-1].mode)
+            switch(modeChangedLogs[modeChangedLogs.length-1].mode) {
+                case 'Arm':
                     stateChangedValue = AlarmState.Armed;
                     break;
-                case 'Home Arm 1':
-                case 'Home Arm 2':
-                case 'Home Arm 3':
+                case 'Home':
                     stateChangedValue = AlarmState.PartiallyArmed;
                     break;
                 case 'Disarm':
@@ -174,6 +217,48 @@ class WoonVeiligRepository {
             formBody.push(encodedKey + "=" + encodedValue);
         }
         return formBody.join("&");
+    }
+
+    private replaceAll(str:string, find:string, replace:string) {
+        return str.replace(new RegExp(find, 'g'), replace);
+      }
+
+    private processcrappyjson(input:string)  {
+        //console.log(input)
+        var prm_jsonData = input.replace("/*-secure-","")
+        prm_jsonData = prm_jsonData.replace("*/","")
+        prm_jsonData = prm_jsonData.replace('{	hisrows : [','{"hisrows":[')
+        prm_jsonData = prm_jsonData.replace(/ {4}|[\t\n\r]/gm,'')
+        var property_names_to_fix = ["d","t","a","s"]
+        for (let i = 0; i < property_names_to_fix.length; i++) {
+            prm_jsonData = this.replaceAll(prm_jsonData,property_names_to_fix[i]+' :','"'+property_names_to_fix[i]+'":')
+        }     
+        var output = JSON.parse(prm_jsonData);
+        return output;
+    }
+
+    private reformattime(date:string,time:string) {
+        var newdate = date.replace("/","-")
+        var newtime = time+":00";
+        const d = new Date();
+        let year = d.getFullYear();
+        return year+"-"+newdate+"T"+newtime
+    }
+
+    private defineAction(action:string){
+        var output = "unknown";
+        if (action == "Arm" || "Disarm" || "Home") {
+            output = "Mode Changed"
+        }
+        return output;
+    }
+
+    private defineMsg(action:string){
+        var output = "Success";
+        if (action.includes("Burglary")  ) {
+            output = "Burglar Alarm"
+        }
+        return output;
     }
 }
 
