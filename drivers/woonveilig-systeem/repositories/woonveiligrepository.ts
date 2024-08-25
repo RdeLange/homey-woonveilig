@@ -51,7 +51,6 @@ class WoonVeiligRepository {
                 'mode': state
             });
             do {
-                console.log("check1")
                 var response = await this.fetchPlus('/action/panelCondPost',request,this.agent) 
                     console.log(response)
                 if (response == true) {
@@ -138,7 +137,7 @@ class WoonVeiligRepository {
         // If the alarm went off, check if it was disarmed
         if(alarmChangedLogs.length > 0) {
             // If it was disarmed, the alarm is off now
-            if(modeDisarmedLogs.length > 0 && modeDisarmedLogs[modeDisarmedLogs.length-1].log_time > alarmChangedLogs[alarmChangedLogs.length-1].log_time) {
+            if(modeDisarmedLogs.length > 0 && modeDisarmedLogs[modeDisarmedLogs.length-1].log_time >= alarmChangedLogs[alarmChangedLogs.length-1].log_time) {
                 alarmChangedValue = false;
             }
             // It was not disarmed, so alarm is on
